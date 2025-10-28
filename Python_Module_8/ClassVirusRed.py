@@ -18,13 +18,14 @@ class VirusRed(pygame.sprite.Sprite):
         # Load spritesheet
         viruspath = os.path.join(SPRITESHEET_PATH, "Enemies","Virus_Red", "virus1_red.png")
         self.flySpriteSheet = SpriteSheet(os.path.join(viruspath),virusSprites)
-        self.attackSpriteSheet = SpriteSheet(SPRITESHEET_PATH + "AttackSheet.png", virusSprites)
+        self.hitSpriteSheet = SpriteSheet(SPRITESHEET_PATH + "Character/Attack/HitSheet.png", virusSprites)
+        self.attackSpriteSheet = SpriteSheet(SPRITESHEET_PATH + "Character/Attack/AttackSheet.png", virusSprites)
 
         #Gets image from directory 
         self.image = self.flySpriteSheet.getSprites(moveRight)[0]
         self.rect = self.image.get_rect(bottomleft = position)
         self.movingRight = moveRight
-
+        self.yDir = 0
         self.animationIndex = 0
         self.currentState = "FLY"
 
@@ -41,6 +42,12 @@ class VirusRed(pygame.sprite.Sprite):
             self.movingRight = True
         elif self.rect.left > WINDOW_WIDTH:
             self.movingRight = False
+        
+        if self.currentState == 'DYING':
+            self.yDir += GRAVITY
+            self.rect.y += self.yDir
+            if self.rect.top > WINDOW_HEIGHT:
+                self.kill()
 
         #Trigger attack animation code:
         heroRect = level.hero.sprite.rect
@@ -71,7 +78,7 @@ class VirusRed(pygame.sprite.Sprite):
         # Animate sprite
         self.animationIndex += self.animationSpeed
         if self.animationIndex >= len(self.currentAnimation):
-            if self.currentState == 'ATTACK':
+            if self.currentState == 'ATTACK' or self.currentState == 'DYING':
                 self.animationIndex = len (self.currentAnimation) -1
             else:
                 self.currentState = 'FLY'
@@ -83,5 +90,14 @@ class VirusRed(pygame.sprite.Sprite):
         self.animationSpeed = ANIMSPEED_VIRUS
         if self.currentState == "FLY":
             self.currentAnimation = self.flySpriteSheet.getSprites(flipped = self.movingRight)
+        elif self.currentState == 'ATTACK':
+            self.animationSpeed = ANIMSPEED_VIRUS_ATTACK
+            self.currentAnimation = self.attackSpriteSheet.getSprites(flipped = self.movingRight)
+        else:
+              self.currentAnimation = self.hitSpriteSheet.getSprites(flipped = self.movingRight)
 
+    def die(self):
+        if self.currentState != "DYING":
+            self.animationIndex = 0
+            self.currentState = 'DYING'
 
