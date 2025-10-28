@@ -61,7 +61,7 @@ class Hero(pygame.sprite.Sprite):
         self.spriteSheets = {
             'IDLE' : idleSpriteSheet,
             'RUN' : runSpriteSheet,
-            'ATTACK' : attackSpriteSheet
+            'ATTACK' : attackSpriteSheet,
             'DIE' : deathSpriteSheet
         }
 
